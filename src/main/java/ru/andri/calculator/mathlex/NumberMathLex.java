@@ -1,4 +1,4 @@
-package ru.andri;
+package ru.andri.calculator.mathlex;
 
 import java.math.BigDecimal;
 

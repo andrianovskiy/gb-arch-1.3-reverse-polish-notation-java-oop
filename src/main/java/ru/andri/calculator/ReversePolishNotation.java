@@ -1,7 +1,11 @@
-package ru.andri;
+package ru.andri.calculator;
 
-import ru.andri.BracketMathLex.BRACKET_TYPE;
-import ru.andri.MathLex.LEX_TYPE;
+import ru.andri.calculator.mathlex.BracketMathLex;
+import ru.andri.calculator.mathlex.BracketMathLex.BRACKET_TYPE;
+import ru.andri.calculator.mathlex.MathLex;
+import ru.andri.calculator.mathlex.MathLex.LEX_TYPE;
+import ru.andri.calculator.mathlex.NumberMathLex;
+import ru.andri.calculator.mathlex.TupleFunctionMathLex;
 
 import java.util.ArrayList;
 import java.util.List;

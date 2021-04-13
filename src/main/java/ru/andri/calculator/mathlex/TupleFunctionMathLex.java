@@ -1,4 +1,4 @@
-package ru.andri;
+package ru.andri.calculator.mathlex;
 
 public class TupleFunctionMathLex implements MathLex {
 

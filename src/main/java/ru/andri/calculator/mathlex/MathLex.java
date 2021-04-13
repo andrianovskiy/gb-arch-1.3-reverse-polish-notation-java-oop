@@ -1,6 +1,6 @@
-package ru.andri;
+package ru.andri.calculator.mathlex;
 
-interface MathLex {
+public interface MathLex {
 
     enum LEX_TYPE {
         TUPLE_FUNC, BRACKET, NUMBER

@@ -1,4 +1,4 @@
-package ru.andri;
+package ru.andri.calculator.mathlex;
 
 public class BracketMathLex implements MathLex {
 
@@ -10,7 +10,7 @@ public class BracketMathLex implements MathLex {
     private static final LEX_TYPE lexType = LEX_TYPE.BRACKET;
     private final BRACKET_TYPE bracketType;
 
-    enum BRACKET_TYPE {
+    public enum BRACKET_TYPE {
         OPEN_BRACKET(SYMBOL_OPEN_BRACKET), CLOSE_BRACKET(SYMBOL_CLOSE_BRACKET);
 
         public final String symbol;
