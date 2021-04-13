@@ -10,15 +10,15 @@ public class TupleFunctionMathLex implements MathLex {
     private static final String SYMBOL_DIVIDE = "/";
 
     private static final LEX_TYPE lexType = LEX_TYPE.TUPLE_FUNC;
-    private final TYPLE_FUNC_TYPE tupleFuncType;
+    private final TUPLE_FUNC_TYPE tupleFuncType;
 
-    enum TYPLE_FUNC_TYPE {
+    enum TUPLE_FUNC_TYPE {
         ADD(SYMBOL_ADD, 1), SUBTRACT(SYMBOL_SUBTRACT, 1), MULTIPLY(SYMBOL_MULTIPLY, 2), DIVIDE(SYMBOL_DIVIDE, 2);
 
         public final String symbol;
         public final int priority;
 
-        TYPLE_FUNC_TYPE(String symbol, int priority) {
+        TUPLE_FUNC_TYPE(String symbol, int priority) {
             this.symbol = symbol;
             this.priority = priority;
         }
@@ -27,16 +27,16 @@ public class TupleFunctionMathLex implements MathLex {
     public TupleFunctionMathLex(String lex) {
         switch (lex) {
             case SYMBOL_ADD:
-                this.tupleFuncType = TYPLE_FUNC_TYPE.ADD;
+                this.tupleFuncType = TUPLE_FUNC_TYPE.ADD;
                 break;
             case SYMBOL_SUBTRACT:
-                this.tupleFuncType = TYPLE_FUNC_TYPE.SUBTRACT;
+                this.tupleFuncType = TUPLE_FUNC_TYPE.SUBTRACT;
                 break;
             case SYMBOL_MULTIPLY:
-                this.tupleFuncType = TYPLE_FUNC_TYPE.MULTIPLY;
+                this.tupleFuncType = TUPLE_FUNC_TYPE.MULTIPLY;
                 break;
             case SYMBOL_DIVIDE:
-                this.tupleFuncType = TYPLE_FUNC_TYPE.DIVIDE;
+                this.tupleFuncType = TUPLE_FUNC_TYPE.DIVIDE;
                 break;
             default:
                 throw new IllegalArgumentException("Ошибка! Некорректный оператор " + lex);

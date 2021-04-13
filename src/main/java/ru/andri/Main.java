@@ -22,7 +22,7 @@ public class Main {
         // Печатаем в обратной польской нотации
         System.out.println(rpn);
         // Рассчитываем результат и выводим в консоль
-        System.out.println(BigDecimal.valueOf(rpn.result()).stripTrailingZeros());
+        System.out.println(BigDecimal.valueOf(rpn.calculate()).stripTrailingZeros());
 
     }
 }

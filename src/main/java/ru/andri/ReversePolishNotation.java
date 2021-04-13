@@ -26,12 +26,12 @@ public class ReversePolishNotation {
      * @param expression Выражение в инфиксной нотации
      */
     public static ReversePolishNotation parse(String expression) {
-        List<MathLex> lexems = new ArrayList<>();
+        List<MathLex> lexemes = new ArrayList<>();
         for (String lex : expression.split(REG_EXP)) {
             lex = lex.stripLeading();
-            lexems.add(stringToMathLex(lex));
+            lexemes.add(stringToMathLex(lex));
         }
-        return new ReversePolishNotation(lexems);
+        return new ReversePolishNotation(lexemes);
     }
 
     private static MathLex stringToMathLex(String lex) {
@@ -49,7 +49,7 @@ public class ReversePolishNotation {
      *
      * @return Результат
      */
-    public double result() {
+    public double calculate() {
         Stack<Double> stack = new Stack<>();
         stack.push(Double.parseDouble("0"));
 
@@ -79,32 +79,43 @@ public class ReversePolishNotation {
                 if (bracketMathLex.isBracketType(BRACKET_TYPE.OPEN_BRACKET)) {
                     stack.push(mathLex);
                 } else {
-                    while (true) {
-                        MathLex t = stack.pop();
-                        if (t.isType(LEX_TYPE.BRACKET) && ((BracketMathLex) t).isBracketType(BRACKET_TYPE.OPEN_BRACKET)) {
-                            break;
-                        }
-                        reversePolishLexemes.push(t);
-                        if (stack.isEmpty()) {
-                            throw new RuntimeException("Ошибка! В выражении либо неверно поставлен разделитель, либо не согласованы скобки");
-                        }
-                    }
+                    pushUntilNotOpenBracket(stack);
                 }
             } else {
-                while (true) {
-                    if (stack.isEmpty() || stack.peek().isType(LEX_TYPE.BRACKET) || ((TupleFunctionMathLex) stack.peek()).compareTo((TupleFunctionMathLex) mathLex) < 0) {
-                        stack.push(mathLex);
-                        break;
-                    } else {
-                        reversePolishLexemes.push(stack.pop());
-                    }
-                }
+                pushUntilFunc(stack, mathLex);
             }
         }
+        pushStackToReversePolishLexemes(stack);
+    }
+
+    private void pushUntilFunc(Stack<MathLex> stack, MathLex currentLex) {
+        while (true) {
+            if (stack.isEmpty() || stack.peek().isType(LEX_TYPE.BRACKET) || ((TupleFunctionMathLex) stack.peek()).compareTo((TupleFunctionMathLex) currentLex) < 0) {
+                stack.push(currentLex);
+                break;
+            } else {
+                reversePolishLexemes.push(stack.pop());
+            }
+        }
+    }
+
+    private void pushUntilNotOpenBracket(Stack<MathLex> stack) {
+        while (true) {
+            MathLex t = stack.pop();
+            if (t.isType(LEX_TYPE.BRACKET) && ((BracketMathLex) t).isBracketType(BRACKET_TYPE.OPEN_BRACKET)) {
+                break;
+            }
+            reversePolishLexemes.push(t);
+            if (stack.isEmpty()) {
+                throw new RuntimeException("Ошибка! В выражении либо неверно поставлен разделитель, либо не согласованы скобки");
+            }
+        }
+    }
+
+    private void pushStackToReversePolishLexemes(Stack<MathLex> stack) {
         while (!stack.isEmpty()) {
             reversePolishLexemes.push(stack.pop());
         }
-
     }
 
     @Override
