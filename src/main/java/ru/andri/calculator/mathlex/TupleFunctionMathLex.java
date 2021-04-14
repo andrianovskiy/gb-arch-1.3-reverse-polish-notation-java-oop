@@ -48,6 +48,10 @@ public class TupleFunctionMathLex implements MathLex {
         return lexType;
     }
 
+    public boolean isCanBeUnaryOperator() {
+        return tupleFuncType == TUPLE_FUNC_TYPE.ADD || tupleFuncType == TUPLE_FUNC_TYPE.SUBTRACT;
+    }
+
     public double calc(double dig1, double dig2) {
         switch (tupleFuncType) {
             case ADD:

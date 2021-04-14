@@ -21,10 +21,14 @@ public class Main {
 
         // Инициализируем класс
         ReversePolishNotation rpn = ReversePolishNotation.parse(expression);
+
         // Печатаем в обратной польской нотации
         System.out.println(rpn);
-        // Рассчитываем результат и выводим в консоль
-        System.out.println(BigDecimal.valueOf(rpn.calculate()).stripTrailingZeros());
 
+        // Рассчитываем результат выражения
+        double result = rpn.calculate();
+
+        // Рассчитываем результат и выводим в консоль
+        System.out.println(BigDecimal.valueOf(result).stripTrailingZeros());
     }
 }

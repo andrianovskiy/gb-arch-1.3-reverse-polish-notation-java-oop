@@ -30,11 +30,16 @@ public class ReversePolishNotation {
      * @param expression Выражение в инфиксной нотации
      */
     public static ReversePolishNotation parse(String expression) {
+        if (expression.isBlank()) {
+            throw new IllegalArgumentException("Ошибка! Пустая строка");
+        }
+
         List<MathLex> lexemes = new ArrayList<>();
         for (String lex : expression.split(REG_EXP)) {
             lex = lex.stripLeading();
             lexemes.add(stringToMathLex(lex));
         }
+
         return new ReversePolishNotation(lexemes);
     }
 
@@ -45,6 +50,78 @@ public class ReversePolishNotation {
             return new BracketMathLex(lex);
         } else {
             return new NumberMathLex(lex);
+        }
+    }
+
+    /**
+     * Конвертация в обратную польскую нотацию
+     */
+    private void convertToReversePolish() {
+        Stack<MathLex> stack = new Stack<>();
+        MathLex prevMathLex = origLexemes.get(0);
+
+        for (MathLex mathLex : origLexemes) {
+            if (mathLex.isType(LEX_TYPE.NUMBER)) {
+                reversePolishLexemes.push(mathLex);
+            } else if (mathLex.isType(LEX_TYPE.BRACKET)) {
+                BracketMathLex bracketMathLex = (BracketMathLex) mathLex;
+                if (bracketMathLex.isBracketType(BRACKET_TYPE.OPEN_BRACKET)) {
+                    stack.push(mathLex);
+                } else {
+                    pushUntilNotOpenBracket(stack, prevMathLex);
+                }
+            } else {
+                if (checkUnaryExpression(prevMathLex, mathLex)) {
+                    reversePolishLexemes.push(new NumberMathLex("0"));
+                }
+                pushUntilFunc(stack, mathLex, prevMathLex);
+            }
+            prevMathLex = mathLex;
+        }
+        pushStackToReversePolishLexemes(stack);
+    }
+
+    private boolean checkUnaryExpression(MathLex prevLex, MathLex currLex) {
+        return prevLex.isType(LEX_TYPE.BRACKET) && currLex.isType(LEX_TYPE.TUPLE_FUNC) && ((TupleFunctionMathLex) currLex).isCanBeUnaryOperator();
+    }
+
+    private void pushUntilFunc(Stack<MathLex> stack, MathLex currentLex, MathLex prevLex) {
+        if (prevLex.isType(LEX_TYPE.TUPLE_FUNC)) {
+            throw new RuntimeException("Ошибка! Некорректное выражение");
+        }
+        while (true) {
+            if (stack.isEmpty() || stack.peek().isType(LEX_TYPE.BRACKET) || ((TupleFunctionMathLex) stack.peek()).compareTo((TupleFunctionMathLex) currentLex) < 0) {
+                stack.push(currentLex);
+                break;
+            } else {
+                reversePolishLexemes.push(stack.pop());
+            }
+        }
+    }
+
+    private void pushUntilNotOpenBracket(Stack<MathLex> stack, MathLex prevLex) {
+        if (prevLex.isType(LEX_TYPE.TUPLE_FUNC)) {
+            throw new RuntimeException("Ошибка! Некорректное выражение");
+        }
+        while (true) {
+            if (stack.isEmpty()) {
+                throw new RuntimeException("Ошибка! В выражении либо неверно поставлен разделитель, либо не согласованы скобки");
+            }
+            MathLex t = stack.pop();
+            if (t.isType(LEX_TYPE.BRACKET) && ((BracketMathLex) t).isBracketType(BRACKET_TYPE.OPEN_BRACKET)) {
+                break;
+            }
+            reversePolishLexemes.push(t);
+        }
+    }
+
+    private void pushStackToReversePolishLexemes(Stack<MathLex> stack) {
+        while (!stack.isEmpty()) {
+            MathLex currLex = stack.pop();
+            if (currLex.isType(LEX_TYPE.BRACKET)) {
+                throw new RuntimeException("Ошибка! Некорректное выражение");
+            }
+            reversePolishLexemes.push(currLex);
         }
     }
 
@@ -61,65 +138,12 @@ public class ReversePolishNotation {
             if (mathLex.isType(LEX_TYPE.NUMBER)) {
                 stack.push(((NumberMathLex) mathLex).getValue());
             } else if (stack.size() < 2) {
-                throw new RuntimeException("Ошибка! Некорректное выражение");
+                throw new RuntimeException("");
             } else {
                 stack.push(((TupleFunctionMathLex) mathLex).calc(stack.pop(), stack.pop()));
             }
         }
         return stack.pop();
-    }
-
-    /**
-     * Конвертация в обратную польскую нотацию
-     */
-    private void convertToReversePolish() {
-        Stack<MathLex> stack = new Stack<>();
-
-        for (MathLex mathLex : origLexemes) {
-            if (mathLex.isType(LEX_TYPE.NUMBER)) {
-                reversePolishLexemes.push(mathLex);
-            } else if (mathLex.isType(LEX_TYPE.BRACKET)) {
-                BracketMathLex bracketMathLex = (BracketMathLex) mathLex;
-                if (bracketMathLex.isBracketType(BRACKET_TYPE.OPEN_BRACKET)) {
-                    stack.push(mathLex);
-                } else {
-                    pushUntilNotOpenBracket(stack);
-                }
-            } else {
-                pushUntilFunc(stack, mathLex);
-            }
-        }
-        pushStackToReversePolishLexemes(stack);
-    }
-
-    private void pushUntilFunc(Stack<MathLex> stack, MathLex currentLex) {
-        while (true) {
-            if (stack.isEmpty() || stack.peek().isType(LEX_TYPE.BRACKET) || ((TupleFunctionMathLex) stack.peek()).compareTo((TupleFunctionMathLex) currentLex) < 0) {
-                stack.push(currentLex);
-                break;
-            } else {
-                reversePolishLexemes.push(stack.pop());
-            }
-        }
-    }
-
-    private void pushUntilNotOpenBracket(Stack<MathLex> stack) {
-        while (true) {
-            MathLex t = stack.pop();
-            if (t.isType(LEX_TYPE.BRACKET) && ((BracketMathLex) t).isBracketType(BRACKET_TYPE.OPEN_BRACKET)) {
-                break;
-            }
-            reversePolishLexemes.push(t);
-            if (stack.isEmpty()) {
-                throw new RuntimeException("Ошибка! В выражении либо неверно поставлен разделитель, либо не согласованы скобки");
-            }
-        }
-    }
-
-    private void pushStackToReversePolishLexemes(Stack<MathLex> stack) {
-        while (!stack.isEmpty()) {
-            reversePolishLexemes.push(stack.pop());
-        }
     }
 
     @Override
