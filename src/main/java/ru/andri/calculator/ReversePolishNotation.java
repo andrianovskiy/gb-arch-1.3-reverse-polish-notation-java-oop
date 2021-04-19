@@ -14,12 +14,10 @@ public class ReversePolishNotation {
     public static final String REG_EXP = "((?<=[-+*/()])|(?=[-+*/()]))";
     private static final String SPACE = " ";
 
-    private final List<MathLex> origLexemes;
     private final List<MathLex> reversePolishLexemes = new LinkedList<>();
 
     private ReversePolishNotation(List<MathLex> origLexemes) {
-        this.origLexemes = origLexemes;
-        convertToReversePolish();
+        convertToReversePolish(origLexemes);
     }
 
     /**
@@ -54,7 +52,7 @@ public class ReversePolishNotation {
     /**
      * Конвертация в обратную польскую нотацию
      */
-    private void convertToReversePolish() {
+    private void convertToReversePolish(List<MathLex> origLexemes) {
         Stack<MathLex> stack = new Stack<>();
         MathLex prevMathLex = origLexemes.get(0);
 
