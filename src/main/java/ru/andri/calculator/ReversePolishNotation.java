@@ -7,9 +7,7 @@ import ru.andri.calculator.mathlex.MathLex.LEX_TYPE;
 import ru.andri.calculator.mathlex.NumberMathLex;
 import ru.andri.calculator.mathlex.TupleFunctionMathLex;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class ReversePolishNotation {
 
@@ -17,7 +15,7 @@ public class ReversePolishNotation {
     private static final String SPACE = " ";
 
     private final List<MathLex> origLexemes;
-    private final Stack<MathLex> reversePolishLexemes = new Stack<>();
+    private final List<MathLex> reversePolishLexemes = new LinkedList<>();
 
     private ReversePolishNotation(List<MathLex> origLexemes) {
         this.origLexemes = origLexemes;
@@ -62,7 +60,7 @@ public class ReversePolishNotation {
 
         for (MathLex mathLex : origLexemes) {
             if (mathLex.isType(LEX_TYPE.NUMBER)) {
-                reversePolishLexemes.push(mathLex);
+                reversePolishLexemes.add(mathLex);
             } else if (mathLex.isType(LEX_TYPE.BRACKET)) {
                 BracketMathLex bracketMathLex = (BracketMathLex) mathLex;
                 if (bracketMathLex.isBracketType(BRACKET_TYPE.OPEN_BRACKET)) {
@@ -72,7 +70,7 @@ public class ReversePolishNotation {
                 }
             } else {
                 if (checkUnaryExpression(prevMathLex, mathLex)) {
-                    reversePolishLexemes.push(new NumberMathLex("0"));
+                    reversePolishLexemes.add(new NumberMathLex("0"));
                 }
                 pushUntilFunc(stack, mathLex, prevMathLex);
             }
@@ -94,7 +92,7 @@ public class ReversePolishNotation {
                 stack.push(currentLex);
                 break;
             } else {
-                reversePolishLexemes.push(stack.pop());
+                reversePolishLexemes.add(stack.pop());
             }
         }
     }
@@ -111,7 +109,7 @@ public class ReversePolishNotation {
             if (t.isType(LEX_TYPE.BRACKET) && ((BracketMathLex) t).isBracketType(BRACKET_TYPE.OPEN_BRACKET)) {
                 break;
             }
-            reversePolishLexemes.push(t);
+            reversePolishLexemes.add(t);
         }
     }
 
@@ -121,7 +119,7 @@ public class ReversePolishNotation {
             if (currLex.isType(LEX_TYPE.BRACKET)) {
                 throw new RuntimeException("Ошибка! Некорректное выражение");
             }
-            reversePolishLexemes.push(currLex);
+            reversePolishLexemes.add(currLex);
         }
     }
 
@@ -138,7 +136,7 @@ public class ReversePolishNotation {
             if (mathLex.isType(LEX_TYPE.NUMBER)) {
                 stack.push(((NumberMathLex) mathLex).getValue());
             } else if (stack.size() < 2) {
-                throw new RuntimeException("");
+                throw new RuntimeException("Ошибка! Некорректное выражение");
             } else {
                 stack.push(((TupleFunctionMathLex) mathLex).calc(stack.pop(), stack.pop()));
             }
@@ -148,11 +146,10 @@ public class ReversePolishNotation {
 
     @Override
     public String toString() {
-        StringBuilder res = new StringBuilder();
-        for (MathLex mathLex : reversePolishLexemes) {
-            res.append(SPACE).append(mathLex);
-        }
-        return res.toString().stripLeading();
+        return reversePolishLexemes.stream()
+                .map(Object::toString)
+                .reduce((str, lex) -> str.concat(SPACE).concat(lex))
+                .orElse("");
     }
 
 }
